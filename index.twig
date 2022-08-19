@@ -2,49 +2,47 @@
 <html>
 
 <head>
+    {% set title = block('title') is defined ? block('title') : Lang.get('general.support_portal')|e %}
+    <title>{{ company }} - {{ title|raw }}</title>
 
-    <title>{{ company }} - {% block title %}{{ Lang.get('general.support_portal') }}{% endblock %}</title>
+    {% block meta %}{% endblock %}
+    <meta property="og:title" content="{{ title|raw }}" />
+    <meta property="og:image" content="{{ get_logo() }}" />
 
-{#    {% block scripts_header %}{% endblock %}  #}
+    {% include 'frontend.' ~ template ~ '.head_common' %}
 
-{#    {{ View.fireHook('frontend.head') }} #}
+    {% block scripts_header %}{% endblock %}
 
-{#    {% set route = Route.currentRouteName() %} #}
+    {{ View.fireHook('frontend.head') }}
 
-{#    {{ View.fireHook('frontend.body_start') }} #}
-{#    {% block meta %}{% include 'frontend.' ~ template ~ '.head_common' %}{% endblock %} #}
-<!-- Meta -->
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="csrf_token" content="{{ csrf_token() }}" />
-<meta name="token" content="{{ Request.input('token') }}" />
-<meta name="date_format" content="{{ Config.get('settings.date_format') }}" />
-<meta name="time_format" content="{{ Config.get('settings.time_format') }}" />
-<meta name="default_country" content="{{ Config.get('settings.default_country') }}" />
-<meta name="max_file_size" content="{{ max_file_size }}" />
-<meta name="allowed_files" content="{{ allowed_files }}" />
-<meta name="environment" content="{{ Config.get('app.environment') }}" />
-
-<!-- Icon -->
-{% if Config.get('settings.favicon') is not empty %}
-    <link rel="icon" type="image/png" href="{{ Config.get('settings.favicon') }}" sizes="32x32" />
-{% endif %}
-
-<!-- CSS -->
-{{ colourScheme|raw }}
-<link data-include href="{{ asset_rev('resources/assets/frontend/css/main.min.css') }}" rel="stylesheet" type="text/css" />
-<link data-include href="{{ asset_rev('resources/assets/frontend/css/Leev3.css') }}" rel="stylesheet" type="text/css" />
+    {% set route = Route.currentRouteName() %}
 </head>
 
 <body class="{{ get_template_mode(false) }} sp-bg-secondary sp-text-primary print:sp-bg-primary">
+
+    {{ View.fireHook('frontend.body_start') }}
 
     <header class="sp-sticky sp-top-0 sp-z-10002 sp-px-6 sp-bg-primary lg:sp-px-8 print:sp-static print:sp-px-0 print:sp-shadow-none
                    {% if not (route starts with 'core.frontend.home') or not(isModuleEnabled('Selfservice')) %}sp-shadow{% endif %}">
         <div class="sp-container sp-relative sp-py-2 sp-m-auto print:sp-max-w-full">
             {{ View.fireHook('frontend.header_start') }}
 
+            <div class="sp-search sp-absolute sp-hidden sp-flex sp-items-center sp-h-full sp-w-full sp--mt-2
+                        sp-bg-primary sp-z-10 print:sp-hidden">
+                <div class="sp-grow sp-w-full">
+                    <form name="search" action="{{ route('core.frontend.search') }}" method="get">
+                        <input type="search" name="query" placeholder="{{ Lang.get('general.search') }}" />
+                    </form>
+                </div>
+                <div class="sp-flex-none">
+                    <div class="sp-search-close sp-button sp-ml-3">
+                        <i class="fas fa-times"></i>
+                    </div>
+                </div>
+            </div>
+
             <div class="sp-flex sp-items-center sp-h-full">
-                <div class="sp-flex-grow">
+                <div class="sp-grow">
                     <a href="{{ route('core.frontend.home') }}">
                         <img src="{{ get_logo(get_template_mode(false) == 'sp-theme-dark') }}" alt="{{ company }}"
                              class="sp-logo sp-inline {% if get_template_mode(false) == 'sp-theme-dark' %}print:sp-hidden{% endif %}" />
@@ -52,19 +50,6 @@
                             <img src="{{ get_logo() }}" alt="{{ company }}" class="sp-logo sp-hidden print:sp-inline" />
                         {% endif %}
                     </a>
-                    <div class="sp-search sp-absolute sp-hidden sp-flex sp-items-center sp-h-full sp-w-full sp--mt-2
-                        sp-bg-primary sp-z-10 print:sp-hidden">
-                      <div class="sp-flex-grow sp-w-full">
-                          <form name="search" action="{{ route('core.frontend.search') }}" method="get">
-                              <input type="search" name="query" placeholder="{{ Lang.get('general.search') }}" />
-                          </form>
-                      </div>
-                      <div class="sp-flex-none">
-                         <div class="sp-search-close sp-button sp-ml-3">
-                            <i class="fas fa-times"></i>
-                         </div>
-                      </div>
-                    </div>
                 </div>
 
                 <div class="sp-flex-none print:sp-hidden">
@@ -76,12 +61,11 @@
                 </div>
 
                 <div class="sp-flex-none sp-hidden lg:sp-block print:sp-hidden">
-                    {#{% if Config.get('settings.website_url') is not empty %}
+                    {% if Config.get('settings.website_url') is not empty %}
                         <a href="{{ Config.get('settings.website_url') }}" class="sp-mr-4">
                             {{ Lang.get('core.back_to_website') }}
                         </a>
-                    {% endif %}#}
-		    {% if Config.get('settings.website_url') is not empty %}<a class="sp-mr-4" href="https://leeprecision.com/" title="Visit https://LeePrecision.com/ to begin shopping!">Shop now!</a>{% endif %}
+                    {% endif %}
 
                     {% if auth_check() %}
                         <div class="sp-dropdown-container sp-relative sp-ml-1">
@@ -134,7 +118,7 @@
 
             <div class="sp-px-6 sp-mb-4 sp-leading-none xs:sp-px-0 xs:sp-mb-6 lg:sp-mb-8">
                 <h1 class="sp-hidden md:sp-block sp-mb-3 sp-text-3xl sp-font-normal print:sp-block">
-                    {{ block('title') }}
+                    {{ title|raw }}
                 </h1>
 
                 <div class="sp-breadcrumb md:sp-text-sm print:sp-mb-6">
@@ -145,9 +129,9 @@
                 <hr class="sp-hidden sp-mx-0 print:sp-block" />
             </div>
 
-            <div class="sp-flex sp-min-w-0 lg:sp-flex-no-wrap">
+            <div class="sp-flex sp-flex-wrap-reverse sp-min-w-0 lg:sp-flex-nowrap">
 
-                <div class="sp-content sp-flex-grow sp-w-full sp-overflow-hidden lg:sp-w-auto">
+                <div class="sp-content sp-grow sp-w-full sp-overflow-hidden lg:sp-w-auto">
 
                     {{ View.fireHook('frontend.content_start') }}
 
@@ -198,14 +182,14 @@
     <div class="sp-px-6 sp-mt-6 sp-border-t sp-border-tertiary print:sp-px-0">
         <div class="sp-container sp-py-6 sp-mx-auto print:sp-max-w-full">
             <div class="sp-flex sp-flex-wrap sp-items-center">
-                <div class="sp-flex-grow sp-w-full sp-mb-3 sm:sp-w-auto sm:sp-mb-0">
+                <div class="sp-grow sp-w-full sp-mb-3 sm:sp-w-auto sm:sp-mb-0">
                     <span class="sp-text-tertiary">
                         &copy; {{ company }}
                     </span>
                 </div>
                 {% if Config.get('settings.language_frontend_toggle') == 1 %}
                     <div class="sp-flex-none sp-w-full sm:sp-w-auto print:sp-hidden">
-                        <i class="fas fa-language"></i> &nbsp;
+                        <i class="fas fa-language" title="{{ Lang.choice('general.language', 1) }}"></i> &nbsp;
                         <select name="language" class="sp-bg-primary">
                             {% for code, language in languages %}
                                 <option value="{{ code }}"
@@ -220,8 +204,7 @@
             </div>
         </div>
     </div>
-</body>
-<footer>
+
     {{ View.fireHook('frontend.footer') }}
 
     {% include 'frontend.' ~ template ~ '.footer_common' %}
@@ -231,5 +214,7 @@
     {% block scripts_footer %}{% endblock %}
 
     {{ View.fireHook('frontend.body_end') }}
-</footer>
+
+</body>
+
 </html>

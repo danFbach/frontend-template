@@ -13,6 +13,7 @@
     laroute.set_root_url("{{ url('/') }}");
     laroute.set_routes({{ routeCollection|raw }});
     laroute.set_prefix('{{ Config.get('laroute.prefix', '') }}');
+    laroute.set_asset_params({v: '{{ Config.get('release.version') }}'});
 </script>
 
 <!-- Vendor -->
@@ -21,4 +22,3 @@
 
 <!-- General -->
 <script src="{{ asset_rev('resources/assets/general/js/main.js') }}"></script>
-<script src="{{ asset_rev('resources/assets/frontend/js/Leev3.min.js')}}" type="text/javascript"></script>
